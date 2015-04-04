@@ -4,7 +4,7 @@
       restrict: 'A',
       link: function (scope, element, attrs) {
         var
-          h = 0, s = 1, v = 1, a = 1, current,
+          h = 0, s = 1, v = 1, a = 0, current,
           container = angular.element('<div class="cp-container"></div>'),
           color = angular.element('<div class="cp-col"><div class="cp-sat"><div class="cp-val"></div></div></div>'),
           hue = angular.element('<div class="cp-hue"></div>'),
@@ -19,12 +19,18 @@
         alpha.append(acursor).on('mousedown', mousedown);
         element.append(container);
 
-        ccursor.css({ top: '-2px', left: '147px' });
-        hcursor.css({ top: '-1px', left: '-1px' });
-        acursor.css({ top: '-1px', left: '170px' });
+        ccursor.css({ top: 0, left: 0 });
+        hcursor.css({ top: 0, left: 0 });
+        acursor.css({ top: 0, left: 0 });
 
         function mousedown(event) {
-          current = angular.element(this);
+          current = {
+            name: angular.element(this).prop('className'),
+            width: angular.element(this).prop('clientWidth') - 1,
+            height: angular.element(this).prop('clientHeight') - 1,
+            top: angular.element(this).prop('offsetTop'),
+            left: angular.element(this).prop('offsetLeft')
+          }
           mousemove(event);
           $document.on('mousemove', mousemove).on('mouseup', function mouseup() {
             $document.off('mousemove', mousemove).off('mouseup', mouseup);
@@ -33,32 +39,31 @@
 
         function mousemove(event) {
           var
-            x = Math.min(current.prop('clientWidth'), Math.max(0, event.pageX - current.prop('offsetLeft'))),
-            y = Math.min(current.prop('clientHeight'), Math.max(0, event.pageY - current.prop('offsetTop')));
+            x = Math.min(current.width, Math.max(0, event.pageX - current.left)),
+            y = Math.min(current.height, Math.max(0, event.pageY - current.top));
           event.stopPropagation();
           event.preventDefault();
-          setColor(current.prop('className'), x, y);
+          setColor(x, y);
         }
 
-        function setColor(name, x, y) {
-          if (name === 'cp-col') {
-            s = bound(x, 150);
-            v = bound(150 - y, 150);
-            ccursor.css({ top: y - 3 + 'px', left: x - 3 + 'px' });
-          } else if (name === 'cp-hue') {
-            h = bound(y, 150);
-            hcursor.css({ top: y - 2 + 'px', left: '-1px' });
+        function setColor(x, y) {
+          if (current.name === 'cp-col') {
+            s = bound(x, current.width);
+            v = bound(current.height - y, current.height);
+            ccursor.css({ top: y + 'px', left: x + 'px' });
+          } else if (current.name === 'cp-hue') {
+            h = bound(y, current.height);
+            hcursor.css({ top: y + 'px' });
             color.css({ 'background-color': 'rgb(' + hsvToRgb(h, 1, 1).join(',') + ')' });
-          } else if (name === 'cp-alpha') {
-            acursor.css({ top: '-1px', left: x - 2 + 'px' });
+          } else if (current.name === 'cp-alpha') {
+            acursor.css({ left: x + 'px' });
           }
-          alpha.children()[0].style.background = 'linear-gradient(to right, rgba(0,0,255,0), rgb(' + hsvToRgb(h, s, v).join(',') + ')';
+          alpha.children().css({ color: 'rgb(' + hsvToRgb(h, s, v) + ')' });
         }
       }
     };
 
     function bound(n, max) {
-      n = Math.min(max, Math.max(0, parseFloat(n)));
       if (Math.abs(n - max) < 0.000001) return 1;
       return (n % max) / parseFloat(max);
     }
@@ -69,13 +74,13 @@
         i = Math.floor(h),
         f = h - i,
         p = v * (1 - s),
-        q = v * (1 - f * s),
-        t = v * (1 - (1 - f) * s),
+        q = v * (1 - s * f),
+        t = v * (1 - s * (1 - f)),
         mod = i % 6,
         r = [v, q, p, p, t, v][mod],
         g = [t, v, v, q, p, p][mod],
         b = [p, p, t, v, v, q][mod];
-      return [r * 255|0, g * 255|0, b * 255|0];
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
   }
   MnxColor.$inject = ['$document'];
