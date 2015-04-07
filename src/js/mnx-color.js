@@ -2,21 +2,65 @@
   function MnxColor($document) {
     return {
       restrict: 'A',
-      link: function (scope, element, attrs) {
+      require: 'ngModel',
+      link: function (scope, element, attrs, ctrl) {
         var
-          h = 0, s = 1, v = 1, a = 0, current,
+          h = 0, s = 0, v = 1, a = 0, current,
           container = angular.element('<div class="cp-container"></div>'),
-          color = angular.element('<div class="cp-col"><div class="cp-sat"><div class="cp-val"></div></div></div>'),
+          color = angular.element('<div class="cp-col"></div>'),
+          colorsvg = [
+            '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
+              '<defs>',
+                '<linearGradient id=s>',
+                  '<stop offset=0 stop-color=#fff/>',
+                  '<stop offset=1 stop-color=#fff stop-opacity=0/>',
+                '</linearGradient>',
+                '<linearGradient id=v x2=0 y2=1>',
+                  '<stop offset=0 stop-color=#000 stop-opacity=0/>',
+                  '<stop offset=1 stop-color=#000/>',
+                '</linearGradient>',
+              '</defs>',
+              '<rect width=100% height=100% fill=url(#s)/>',
+              '<rect width=100% height=100% fill=url(#v)/>',
+            '</svg>'
+          ].join(''),
           hue = angular.element('<div class="cp-hue"></div>'),
-          alpha = angular.element('<div class="cp-alpha"><div class="cp-alpha-inner"></div></div>'),
+          huesvg = [
+            '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
+              '<defs>',
+                '<linearGradient id=h x2=0 y2=1>',
+                  '<stop stop-color=#f00 offset=0/>',
+                  '<stop stop-color=#ff0 offset=.17/>',
+                  '<stop stop-color=#0f0 offset=.33/>',
+                  '<stop stop-color=#0ff offset=.5/>',
+                  '<stop stop-color=#00f offset=.67/>',
+                  '<stop stop-color=#f0f offset=.83/>',
+                  '<stop stop-color=#f00 offset=1/>',
+                '</linearGradient>',
+              '</defs>',
+              '<rect width=100% height=100% fill=url(#h)/>',
+            '</svg>'
+          ].join(''),
+          alpha = angular.element('<div class="cp-alpha"></div>'),
+          alphasvg = [
+            '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
+              '<defs>',
+                '<linearGradient id=a>',
+                  '<stop offset=0 stop-opacity=0 stop-color=#fff/>',
+                  '<stop offset=1 stop-color=#fff/>',
+                '</linearGradient>',
+              '</defs>',
+              '<rect width=100% height=100% fill=url(#a)/>',
+            '</svg>'
+          ].join(''),
           ccursor = angular.element('<div class="cp-ccursor"></div>'),
           hcursor = angular.element('<div class="cp-hcursor"></div>'),
           acursor = angular.element('<div class="cp-acursor"></div>');
 
         container.append(color).append(hue).append(alpha);
-        color.append(ccursor).on('mousedown', mousedown);
-        hue.append(hcursor).on('mousedown', mousedown);
-        alpha.append(acursor).on('mousedown', mousedown);
+        color.append(colorsvg).append(ccursor).on('mousedown', mousedown);
+        hue.append(huesvg).append(hcursor).on('mousedown', mousedown);
+        alpha.append(alphasvg).append(acursor).on('mousedown', mousedown);
         element.append(container);
 
         ccursor.css({ top: 0, left: 0 });
@@ -56,9 +100,11 @@
             hcursor.css({ top: y + 'px' });
             color.css({ 'background-color': 'rgb(' + hsvToRgb(h, 1, 1).join(',') + ')' });
           } else if (current.name === 'cp-alpha') {
+            a = bound(x, current.width);
             acursor.css({ left: x + 'px' });
           }
-          alpha.children().css({ color: 'rgb(' + hsvToRgb(h, s, v) + ')' });
+          alpha.find('stop').attr('stop-color', 'rgb(' + hsvToRgb(h, s, v) + ')');
+          ctrl.$setViewValue('rgba(' + hsvToRgb(h, s, v).join(',') + ',' + Math.round(a * 100) / 100 + ')');
         }
       }
     };

@@ -1,50 +1,39 @@
-.cp-container {
-  display: inline-block;
-  padding: 5px;
-  border: 1px solid #000;
-}
+.cp-container,
 .cp-container div {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select:none;
 }
-.cp-col {
+.cp-container svg { display: block; }
+.cp-col,
+.cp-hue,
+.cp-alpha { position: relative; }
+.cp-alpha { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQYV2NkYGDwYcAEW9CFGIeIQix+wfQgyDODXSEAq2cGh0FBvIcAAAAASUVORK5CYII="); }
+.cp-ccursor,
+.cp-hcursor,
+.cp-acursor { position: absolute; }
+
+/* STYLEABLE */
+.cp-container {
   display: inline-block;
-  position: relative;
-  width: 150px; height: 150px;
+  padding: 5px;
   border: 1px solid #000;
 }
-.cp-sat,
-.cp-val {
-  width: 100%; height: 100%;
-  background-image: linear-gradient(to right, #fff, rgba(204,154,129,0));
-}
-.cp-val {
-  background-image: linear-gradient(to top, #000, rgba(204,154,129,0));
+.cp-col {
+  display: inline-block;
+  width: 127px; height: 127px;
+  border: 1px solid #000;
 }
 .cp-hue {
   display: inline-block;
-  position: relative;
-  width: 15px; height: 150px;
+  width: 15px; height: 127px;
   margin-left: 5px;
   border: 1px solid #000;
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACWCAIAAACQFHUlAAAAfUlEQVQoU3WLyQpCMRAES2yULP7/j2Z5IKgHE5gMyaGpVHdGXxBhJCHioPVoPCCyc8/Nft1RB1VWNpPTvuv9XgYhCLIgjUTznp4dZ/9y7v69H6IiOqKZdP699cnivBpe+/35QQGUWBlNZm/d9qf7AMqDN5qgiIXV5LTv+oU/dw1PXbWgu7UAAAAASUVORK5CYII=");
 }
 .cp-alpha {
-  position: relative;
-  height: 10px;
+  width: 149px; height: 15px;
   border: 1px solid #000;
-  background: #fff url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQYV2NkYGDwYcAEW9CFGIeIQix+wfQgyDODXSEAq2cGh0FBvIcAAAAASUVORK5CYII=");
-}
-.cp-alpha-inner {
-  height: 10px;
-  background: linear-gradient(to right, rgba(0,0,255,0), currentColor);
-}
-.cp-ccursor,
-.cp-hcursor,
-.cp-acursor {
-  position: absolute;
 }
 .cp-ccursor:before,
 .cp-ccursor:after,
@@ -71,4 +60,4 @@
   outline: #000 solid 1px;
 }
 .cp-hcursor:after { width: 15px; height: 1px; }
-.cp-acursor:after { width: 1px; height: 10px; }
+.cp-acursor:after { width: 1px; height: 15px; }
