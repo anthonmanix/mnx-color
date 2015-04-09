@@ -1,9 +1,10 @@
-(function () {
+(function (angular) {
+  'use strict';
   function MnxColor($document) {
     return {
       restrict: 'A',
       require: 'ngModel',
-      link: function (scope, element, attrs, ctrl) {
+      link: function link(scope, element, attrs, ctrl) {
         var
           rgb = [255, 255, 255], hsv = [0, 0, 1], a = 1, pickers, current,
           container = angular.element('<div class="cp-container"></div>'),
@@ -56,9 +57,11 @@
               '</svg>',
             '</div>'
           ].join('')),
+          stops = alpha.find('stop'),
           ccursor = angular.element('<div class="cp-ccursor"></div>'),
           hcursor = angular.element('<div class="cp-hcursor"></div>'),
-          acursor = angular.element('<div class="cp-acursor"></div>');
+          acursor = angular.element('<div class="cp-acursor"></div>'),
+          unwatch;
 
         container.append(color).append(hue).append(alpha);
         color.append(ccursor).on('mousedown', mousedown);
@@ -66,7 +69,7 @@
         alpha.append(acursor).on('mousedown', mousedown);
         element.append(container);
         pickers = { col: pickerMeta(color), hue: pickerMeta(hue), alpha: pickerMeta(alpha) };
-        inputUpdate();
+        watch();
 
         function pickerMeta(picker) {
           return {
@@ -76,11 +79,17 @@
           };
         }
 
+        function watch() {
+          unwatch = scope.$watch(attrs.ngModel, inputParse);
+        }
+
         function mousedown(event) {
+          unwatch();
           current = pickers[angular.element(this).attr('name')];
           mousemove(event);
           $document.on('mousemove', mousemove).on('mouseup', function mouseup() {
             $document.off('mousemove', mousemove).off('mouseup', mouseup);
+            watch();
           });
         }
 
@@ -95,22 +104,38 @@
 
         function pickerUpdate(x, y) {
           if (current.name === 'alpha') {
-            a = bound(x, current.width);
+            a = x / current.width;
             acursor.css({ left: x + 'px' });
           } else {
             if (current.name === 'col') {
-              hsv[1] = bound(x, current.width);
-              hsv[2] = bound(current.height - y, current.height);
+              hsv[1] = x / current.width;
+              hsv[2] = (current.height - y) / current.height;
               ccursor.css({ top: y + 'px', left: x + 'px' });
             } else if (current.name === 'hue') {
-              hsv[0] = bound(y, current.height);
+              hsv[0] = y / current.height;
               hcursor.css({ top: y + 'px' });
               color.css({ 'background-color': 'rgb(' + hsvToRgb([hsv[0], 1, 1]) + ')' });
             }
             rgb = hsvToRgb(hsv);
-            alpha.find('stop').attr('stop-color', 'rgb(' + rgb + ')');
+            stops.attr('stop-color', 'rgb(' + rgb + ')');
           }
-          ctrl.$setViewValue('rgba(' + rgb + ',' + Math.round(a * 100) / 100 + ')');
+          if (a !== 1) ctrl.$setViewValue('rgba(' + rgb + ',' + Math.round(a * 100) / 100 + ')');
+          else ctrl.$setViewValue('#' + rgb[0].toString(16) + rgb[1].toString(16) + rgb[2].toString(16));
+        }
+
+        function inputParse(value) {
+          var match = [];
+          if ((match = /#([0-9a-fA-f]{2})([0-9a-fA-f]{2})([0-9a-fA-f]{2})/.exec(value))) {
+            rgb = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16)];
+            a = 1;
+          } else if ((match = /rgb\((\d+)\s?,(\d+)\s?,(\d+)\s?\)/.exec(value))) {
+            rgb = [+match[1], +match[2], +match[3]];
+            a = 1;
+          } else if ((match = /rgba\((\d+)\s?,(\d+)\s?,(\d+)\s?,(\d*\.?\d+)\)/.exec(value))) {
+            rgb = [+match[1], +match[2], +match[3]];
+            a = +match[4];
+          }
+          inputUpdate();
         }
 
         function inputUpdate() {
@@ -122,38 +147,28 @@
           hcursor.css({ top: Math.round(hsv[0] * pickers.hue.height) + 'px', left: 0 });
           acursor.css({ top: 0, left: Math.round(a * pickers.alpha.width) + 'px' });
           color.css({ 'background-color': 'rgb(' + hsvToRgb([hsv[0], 1, 1]) + ')' });
-          alpha.find('stop').attr('stop-color', 'rgb(' + rgb + ')');
+          stops.attr('stop-color', 'rgb(' + rgb + ')');
         }
       }
     };
   }
   MnxColor.$inject = ['$document'];
 
-  function bound(n, max) {
-    if (Math.abs(n - max) < 0.000001) return 1;
-    return (n % max) / parseFloat(max);
-  }
-
   function rgbToHsv(rgb) {
     var
-      r = bound(rgb[0], 255),
-      g = bound(rgb[1], 255),
-      b = bound(rgb[2], 255),
-      max = Math.max(r, g, b), min = Math.min(r, g, b),
-      h, s, v = max,
-      d = max - min;
-    s = max === 0 ? 0 : d / max;
-    if (max == min) {
-        h = 0;
-    } else {
+      r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255,
+      max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min,
+      h = 0, s = 0;
+    if (max !== min) {
       switch (max) {
         case r: h = (g - b) / d + (g < b ? 6 : 0); break;
         case g: h = (b - r) / d + 2; break;
         case b: h = (r - g) / d + 4; break;
       }
       h /= 6;
+      s = d / max;
     }
-    return [h, s, v];
+    return [h, s, max];
   }
 
   function hsvToRgb(hsv) {
@@ -172,4 +187,4 @@
   }
 
   angular.module('mnxColor', []).directive('mnxColor', MnxColor);
-})();
+})(window.angular);
