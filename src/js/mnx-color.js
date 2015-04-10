@@ -6,7 +6,7 @@
       require: 'ngModel',
       link: function link(scope, element, attrs, ctrl) {
         var
-          rgb = [255, 255, 255], hsv = [0, 0, 1], a = 1, pickers, current,
+          rgb = [0, 0, 0], hsv = [0, 0, 0], a = 1, pickers, current,
           container = angular.element('<div class="cp-container"></div>'),
           color = angular.element([
             '<div name="col" class="cp-col">',
@@ -49,8 +49,8 @@
               '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
                 '<defs>',
                   '<linearGradient id=a>',
-                    '<stop offset=0 stop-opacity=0 stop-color=#fff/>',
-                    '<stop offset=1 stop-color=#fff/>',
+                    '<stop offset=0 stop-opacity=0 stop-color=#0/>',
+                    '<stop offset=1 stop-color=#000/>',
                   '</linearGradient>',
                 '</defs>',
                 '<rect width=100% height=100% fill=url(#a)/>',
@@ -69,6 +69,7 @@
         alpha.append(acursor).on('mousedown', mousedown);
         element.append(container);
         pickers = { col: pickerMeta(color), hue: pickerMeta(hue), alpha: pickerMeta(alpha) };
+        inputUpdate();
         watch();
 
         function pickerMeta(picker) {
@@ -124,17 +125,23 @@
         }
 
         function inputParse(value) {
-          var match = [];
-          if ((match = /#([0-9a-fA-f]{2})([0-9a-fA-f]{2})([0-9a-fA-f]{2})/.exec(value))) {
-            rgb = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16)];
-            a = 1;
-          } else if ((match = /rgb\((\d+)\s?,(\d+)\s?,(\d+)\s?\)/.exec(value))) {
-            rgb = [+match[1], +match[2], +match[3]];
-            a = 1;
-          } else if ((match = /rgba\((\d+)\s?,(\d+)\s?,(\d+)\s?,(\d*\.?\d+)\)/.exec(value))) {
-            rgb = [+match[1], +match[2], +match[3]];
-            a = +match[4];
+          var m = [];
+          if ((m = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(value))) {
+            rgb = [parseInt(m[1] + m[1], 16), parseInt(m[2] + m[2], 16), parseInt(m[3] + m[3], 16)];
+          } else if ((m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(value))) {
+            rgb = [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+          } else if ((m = /^rgba?\((\d+),\s?(\d+),\s?(\d+),?\s?(\d*\.?\d+)?\)$/.exec(value))) {
+            rgb = [+m[1], +m[2], +m[3]];
+          } else if (value && (m = /^[a-z]{3,}$/i.exec(value))) {
+            hue.css({ color: m[0] });
+            if (hue.css('color') !== value) return;
+            m = window.getComputedStyle(hue[0]).color.match(/(\d)+/g) || [0, 0, 0, '0'];
+            m.unshift(0);
+            rgb = [+m[1], +m[2], +m[3]];
+          } else {
+            return;
           }
+          a = +(m[4] || 1);
           inputUpdate();
         }
 
