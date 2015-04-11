@@ -18,3 +18,9 @@ angular.module('app', ['mnxColor']);
 ```
 
 ### Usage
+
+Apply the directive to the form element
+
+``` html
+<input mnx-color>
+```

@@ -10,13 +10,13 @@
 .mnx-color-hue,
 .mnx-color-alpha { position: relative; }
 .mnx-color-alpha { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQYV2NkYGDwYcAEW9CFGIeIQix+wfQgyDODXSEAq2cGh0FBvIcAAAAASUVORK5CYII="); }
+.mnx-color-container,
 .mnx-color-ccursor,
 .mnx-color-hcursor,
 .mnx-color-acursor { position: absolute; }
 
 /* STYLEABLE */
 .mnx-color-container {
-  display: inline-block;
   padding: 5px;
   border: 1px solid #000;
 }

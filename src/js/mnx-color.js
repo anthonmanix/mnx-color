@@ -42,7 +42,7 @@
         color.append(ccursor).on('mousedown', mousedown);
         hue.append(hcursor).on('mousedown', mousedown);
         alpha.append(acursor).on('mousedown', mousedown);
-        element.append(container);
+        element.after(container);
         pickers = { col: pickerMeta(color), hue: pickerMeta(hue), alpha: pickerMeta(alpha) };
         inputUpdate();
         watch();
@@ -50,8 +50,8 @@
         function pickerMeta(picker) {
           return {
             name: picker.attr('name'),
-            width: picker.prop('clientWidth') - 1, height: picker.prop('clientHeight') - 1,
-            top: picker.prop('offsetTop'), left: picker.prop('offsetLeft')
+            width: picker.prop('clientWidth') - 1,
+            height: picker.prop('clientHeight') - 1
           };
         }
 
@@ -60,8 +60,11 @@
         }
 
         function mousedown(event) {
+          var _this = this, parent = _this.offsetParent;
+          current = pickers[_this.getAttribute('name')];
+          current.top = parent.offsetTop + parent.clientTop + _this.offsetTop + _this.clientTop;
+          current.left = parent.offsetLeft + parent.clientLeft + _this.offsetLeft + _this.clientLeft;
           unwatch();
-          current = pickers[angular.element(this).attr('name')];
           mousemove(event);
           $document.on('mousemove', mousemove).on('mouseup', function mouseup() {
             $document.off('mousemove', mousemove).off('mouseup', mouseup);
@@ -97,6 +100,7 @@
           }
           if (a !== 1) ctrl.$setViewValue('rgba(' + rgb + ',' + Math.round(a * 100) / 100 + ')');
           else ctrl.$setViewValue('#' + rgb[0].toString(16) + rgb[1].toString(16) + rgb[2].toString(16));
+          ctrl.$render();
         }
 
         function inputParse(value) {
