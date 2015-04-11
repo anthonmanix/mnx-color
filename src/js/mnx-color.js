@@ -38,22 +38,27 @@
           acursor = angular.element('<div class="' + ns + 'acursor"></div>'),
           unwatch;
 
-        container.append(color).append(hue).append(alpha);
-        color.append(ccursor).on('mousedown', mousedown);
-        hue.append(hcursor).on('mousedown', mousedown);
-        alpha.append(acursor).on('mousedown', mousedown);
-        element.after(container);
-        pickers = { col: pickerMeta(color), hue: pickerMeta(hue), alpha: pickerMeta(alpha) };
-        inputUpdate();
-        watch();
-
-        function pickerMeta(picker) {
-          return {
-            name: picker.attr('name'),
-            width: picker.prop('clientWidth') - 1,
-            height: picker.prop('clientHeight') - 1
-          };
-        }
+        container
+          .append(color.append(ccursor))
+          .append(hue.append(hcursor))
+          .append(alpha.append(acursor));
+        element.on('focus', function () {
+          container.css({
+            top: element[0].offsetTop + element[0].offsetHeight + 'px',
+            left: element[0].offsetLeft + 'px'
+          });
+          element.after(container);
+          color.on('mousedown', mousedown);
+          hue.on('mousedown', mousedown);
+          alpha.on('mousedown', mousedown);
+          inputUpdate();
+          watch();
+          element.on('blur', function blur() {
+            element.off('blur', blur);
+            unwatch();
+            container.remove();
+          });
+        });
 
         function watch() {
           unwatch = scope.$watch(attrs.ngModel, inputParse);
@@ -61,9 +66,13 @@
 
         function mousedown(event) {
           var _this = this, parent = _this.offsetParent;
-          current = pickers[_this.getAttribute('name')];
-          current.top = parent.offsetTop + parent.clientTop + _this.offsetTop + _this.clientTop;
-          current.left = parent.offsetLeft + parent.clientLeft + _this.offsetLeft + _this.clientLeft;
+          current = {
+            name: _this.getAttribute('name'),
+            width: _this.clientWidth - 1,
+            height: _this.clientHeight - 1,
+            top: parent.offsetTop + parent.clientTop + _this.offsetTop + _this.clientTop,
+            left: parent.offsetLeft + parent.clientLeft + _this.offsetLeft + _this.clientLeft
+          }
           unwatch();
           mousemove(event);
           $document.on('mousemove', mousemove).on('mouseup', function mouseup() {
@@ -103,7 +112,8 @@
           ctrl.$render();
         }
 
-        function inputParse(value) {
+        function inputParse(value, old) {
+          if (value === old) return;
           var m = [];
           if ((m = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(value))) {
             rgb = [parseInt(m[1] + m[1], 16), parseInt(m[2] + m[2], 16), parseInt(m[3] + m[3], 16)];
@@ -113,7 +123,6 @@
             rgb = [+m[1], +m[2], +m[3]];
           } else if (value && (m = /^[a-z]{3,}$/i.exec(value))) {
             hue.css({ color: m[0] });
-            if (hue.css('color') !== value) return;
             m = window.getComputedStyle(hue[0]).color.match(/(\d)+/g) || [0, 0, 0, '0'];
             m.unshift(0);
             rgb = [+m[1], +m[2], +m[3]];
@@ -127,11 +136,11 @@
         function inputUpdate() {
           hsv = rgbToHsv(rgb);
           ccursor.css({
-            top: Math.round(pickers.col.height - hsv[2] * pickers.col.height) + 'px',
-            left: Math.round(hsv[1] * pickers.col.width) + 'px'
+            top: Math.round((color[0].clientHeight - 1) - hsv[2] * (color[0].clientHeight - 1)) + 'px',
+            left: Math.round(hsv[1] * (color[0].clientWidth - 1)) + 'px'
           });
-          hcursor.css({ top: Math.round(hsv[0] * pickers.hue.height) + 'px', left: 0 });
-          acursor.css({ top: 0, left: Math.round(a * pickers.alpha.width) + 'px' });
+          hcursor.css({ top: Math.round(hsv[0] * (hue[0].clientHeight - 1)) + 'px', left: 0 });
+          acursor.css({ top: 0, left: Math.round(a * (alpha[0].clientWidth - 1)) + 'px' });
           color.css({ 'background-color': 'rgb(' + hsvToRgb([hsv[0], 1, 1]) + ')' });
           stops.attr('stop-color', 'rgb(' + rgb + ')');
         }

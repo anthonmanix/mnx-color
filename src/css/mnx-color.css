@@ -17,6 +17,7 @@
 
 /* STYLEABLE */
 .mnx-color-container {
+  display: block;
   padding: 5px;
   border: 1px solid #000;
 }
