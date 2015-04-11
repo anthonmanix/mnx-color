@@ -1,5 +1,10 @@
 (function (angular) {
   'use strict';
+  var
+    ns = 'mnx-color-',
+    svg = '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg><defs>',
+    rect = '<rect width=100% height=100% fill=url(#';
+
   function MnxColor($document) {
     return {
       restrict: 'A',
@@ -7,60 +12,30 @@
       link: function link(scope, element, attrs, ctrl) {
         var
           rgb = [0, 0, 0], hsv = [0, 0, 0], a = 1, pickers, current,
-          container = angular.element('<div class="cp-container"></div>'),
+          container = angular.element('<div class="' + ns + 'container"></div>'),
           color = angular.element([
-            '<div name="col" class="cp-col">',
-              '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
-                '<defs>',
-                  '<linearGradient id=s>',
-                    '<stop offset=0 stop-color=#fff/>',
-                    '<stop offset=1 stop-color=#fff stop-opacity=0/>',
-                  '</linearGradient>',
-                  '<linearGradient id=v x2=0 y2=1>',
-                    '<stop offset=0 stop-color=#000 stop-opacity=0/>',
-                    '<stop offset=1 stop-color=#000/>',
-                  '</linearGradient>',
-                '</defs>',
-                '<rect width=100% height=100% fill=url(#s)/>',
-                '<rect width=100% height=100% fill=url(#v)/>',
-              '</svg>',
+            '<div name="col" class="' + ns + 'col">',
+              svg,
+                gradient('s', ['fff', 'fff0']), gradient('v', ['0000', '000'], 1),
+              '</defs>', rect + 's)/>', rect + 'v)/></svg>',
             '</div>'
           ].join('')),
           hue = angular.element([
-            '<div name="hue" class="cp-hue">',
-              '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
-                '<defs>',
-                  '<linearGradient id=h x2=0 y2=1>',
-                    '<stop stop-color=#f00 offset=0/>',
-                    '<stop stop-color=#ff0 offset=.17/>',
-                    '<stop stop-color=#0f0 offset=.33/>',
-                    '<stop stop-color=#0ff offset=.5/>',
-                    '<stop stop-color=#00f offset=.67/>',
-                    '<stop stop-color=#f0f offset=.83/>',
-                    '<stop stop-color=#f00 offset=1/>',
-                  '</linearGradient>',
-                '</defs>',
-                '<rect width=100% height=100% fill=url(#h)/>',
-              '</svg>',
+            '<div name="hue" class="' + ns + 'hue">',
+              svg,
+                gradient('h', ['f00', 'ff0', '0f0', '0ff', '00f', 'f0f', 'f00'], 1),
+              '</defs>', rect + 'h)/></svg>',
             '</div>'
           ].join('')),
           alpha = angular.element([
-            '<div name="alpha" class="cp-alpha">',
-              '<svg width=100% height=100% xmlns=http://www.w3.org/2000/svg>',
-                '<defs>',
-                  '<linearGradient id=a>',
-                    '<stop offset=0 stop-opacity=0 stop-color=#0/>',
-                    '<stop offset=1 stop-color=#000/>',
-                  '</linearGradient>',
-                '</defs>',
-                '<rect width=100% height=100% fill=url(#a)/>',
-              '</svg>',
+            '<div name="alpha" class="' + ns + 'alpha">',
+              svg, gradient('a', ['0000', '000']), '</defs>', rect + 'a)/></svg>',
             '</div>'
           ].join('')),
           stops = alpha.find('stop'),
-          ccursor = angular.element('<div class="cp-ccursor"></div>'),
-          hcursor = angular.element('<div class="cp-hcursor"></div>'),
-          acursor = angular.element('<div class="cp-acursor"></div>'),
+          ccursor = angular.element('<div class="' + ns + 'ccursor"></div>'),
+          hcursor = angular.element('<div class="' + ns + 'hcursor"></div>'),
+          acursor = angular.element('<div class="' + ns + 'acursor"></div>'),
           unwatch;
 
         container.append(color).append(hue).append(alpha);
@@ -160,6 +135,20 @@
     };
   }
   MnxColor.$inject = ['$document'];
+
+  function gradient(id, stops, dir) {
+    var
+      g = ['<linearGradient id=', id, dir ? ' x2=0 y2=1' : '', '>'],
+      i = 0, len = stops.length - 1;
+    for (; i <= len; i += 1) {
+      g.push(
+        '<stop offset=', i / len,
+        ' stop-color=#', stops[i].substr(0, 3),
+        ' stop-opacity=', stops[i][3] || 1, '/>');
+    }
+    g.push('</linearGradient>');
+    return g.join('');
+  }
 
   function rgbToHsv(rgb) {
     var

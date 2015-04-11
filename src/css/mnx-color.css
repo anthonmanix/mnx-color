@@ -1,63 +1,63 @@
-.cp-container,
-.cp-container div {
+.mnx-color-container,
+.mnx-color-container div {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select:none;
 }
-.cp-container svg { display: block; }
-.cp-col,
-.cp-hue,
-.cp-alpha { position: relative; }
-.cp-alpha { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQYV2NkYGDwYcAEW9CFGIeIQix+wfQgyDODXSEAq2cGh0FBvIcAAAAASUVORK5CYII="); }
-.cp-ccursor,
-.cp-hcursor,
-.cp-acursor { position: absolute; }
+.mnx-color-container svg { display: block; }
+.mnx-color-col,
+.mnx-color-hue,
+.mnx-color-alpha { position: relative; }
+.mnx-color-alpha { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQYV2NkYGDwYcAEW9CFGIeIQix+wfQgyDODXSEAq2cGh0FBvIcAAAAASUVORK5CYII="); }
+.mnx-color-ccursor,
+.mnx-color-hcursor,
+.mnx-color-acursor { position: absolute; }
 
 /* STYLEABLE */
-.cp-container {
+.mnx-color-container {
   display: inline-block;
   padding: 5px;
   border: 1px solid #000;
 }
-.cp-col {
+.mnx-color-col {
   display: inline-block;
   width: 127px; height: 127px;
   border: 1px solid #000;
 }
-.cp-hue {
+.mnx-color-hue {
   display: inline-block;
   width: 15px; height: 127px;
   margin-left: 5px;
   border: 1px solid #000;
 }
-.cp-alpha {
+.mnx-color-alpha {
   width: 149px; height: 15px;
   border: 1px solid #000;
 }
-.cp-ccursor:before,
-.cp-ccursor:after,
-.cp-hcursor:after,
-.cp-acursor:after {
+.mnx-color-ccursor:before,
+.mnx-color-ccursor:after,
+.mnx-color-hcursor:after,
+.mnx-color-acursor:after {
   content: "";
   position: absolute;
   border: 1px solid #fff;
 }
-.cp-ccursor:before,
-.cp-ccursor:after {
+.mnx-color-ccursor:before,
+.mnx-color-ccursor:after {
   top: -2px; left: -2px;
   width: 3px; height: 3px;
   border-radius: 50%;
 }
-.cp-ccursor:after {
+.mnx-color-ccursor:after {
   top: -3px; left: -3px;
   width: 5px; height: 5px;
   border-color: #000;
 }
-.cp-hcursor:after,
-.cp-acursor:after {
+.mnx-color-hcursor:after,
+.mnx-color-acursor:after {
   top: -1px; left: -1px;
   outline: #000 solid 1px;
 }
-.cp-hcursor:after { width: 15px; height: 1px; }
-.cp-acursor:after { width: 1px; height: 15px; }
+.mnx-color-hcursor:after { width: 15px; height: 1px; }
+.mnx-color-acursor:after { width: 1px; height: 15px; }
