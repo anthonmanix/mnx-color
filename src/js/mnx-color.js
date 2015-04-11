@@ -42,7 +42,7 @@
           .append(color.append(ccursor))
           .append(hue.append(hcursor))
           .append(alpha.append(acursor));
-        element.on('focus', function () {
+        element.on('focus', function focus() {
           container.css({
             top: element[0].offsetTop + element[0].offsetHeight + 'px',
             left: element[0].offsetLeft + 'px'
@@ -104,11 +104,22 @@
               hcursor.css({ top: y + 'px' });
               color.css({ 'background-color': 'rgb(' + hsvToRgb([hsv[0], 1, 1]) + ')' });
             }
+
             rgb = hsvToRgb(hsv);
             stops.attr('stop-color', 'rgb(' + rgb + ')');
           }
-          if (a !== 1) ctrl.$setViewValue('rgba(' + rgb + ',' + Math.round(a * 100) / 100 + ')');
-          else ctrl.$setViewValue('#' + rgb[0].toString(16) + rgb[1].toString(16) + rgb[2].toString(16));
+
+          if (a !== 1) {
+            ctrl.$setViewValue('rgba(' + rgb + ',' + Math.round(a * 100) / 100 + ')');
+          } else {
+            ctrl.$setViewValue([
+              '#',
+              ('0' + rgb[0].toString(16)).substr(-2),
+              ('0' + rgb[1].toString(16)).substr(-2),
+              ('0' + rgb[2].toString(16)).substr(-2)
+            ].join(''));
+          }
+
           ctrl.$render();
         }
 
@@ -124,11 +135,16 @@
           } else if (value && (m = /^[a-z]{3,}$/i.exec(value))) {
             hue.css({ color: m[0] });
             m = window.getComputedStyle(hue[0]).color.match(/(\d)+/g) || [0, 0, 0, '0'];
+            if (m.join() === rgb.join() + (a !== 1 ? ',' + a : '')) {
+              return;
+            }
+
             m.unshift(0);
             rgb = [+m[1], +m[2], +m[3]];
           } else {
             return;
           }
+
           a = +(m[4] || 1);
           inputUpdate();
         }
@@ -147,6 +163,7 @@
       }
     };
   }
+
   MnxColor.$inject = ['$document'];
 
   function gradient(id, stops, dir) {
@@ -159,6 +176,7 @@
         ' stop-color=#', stops[i].substr(0, 3),
         ' stop-opacity=', stops[i][3] || 1, '/>');
     }
+
     g.push('</linearGradient>');
     return g.join('');
   }
@@ -177,6 +195,7 @@
       h /= 6;
       s = d / max;
     }
+
     return [h, s, max];
   }
 
