@@ -1,6 +1,6 @@
 (function (angular) {
   'use strict';
-  var ns = 'mnx-color-';
+  var ns = 'mnx-color-', uid = 0;
   
   /**
    * Creates a layered SVG gradient
@@ -18,14 +18,15 @@
       stops, sidx, slen;
     
     for (lidx = 0; lidx < llen; lidx += 1) {
-      defs.push('<linearGradient id=g', lidx, layers[lidx].dir ? ' x2=0 y2=1' : '', '>');
+      uid += 1;
+      defs.push('<linearGradient id=g', uid, layers[lidx].dir ? ' x2=0 y2=1' : '', '>');
       stops = layers[lidx].stops;
       slen = stops.length - 1;
       for (sidx = 0; sidx <= slen; sidx += 1) {
         defs.push('<stop offset=', sidx / slen, ' stop-color=#', stops[sidx].substr(0, 3), ' stop-opacity=', stops[sidx][3] || 1, '/>');
       }
       defs.push('</linearGradient>');
-      svg.push('<rect width=100% height=100% fill=url(#g', lidx, ')/>');
+      svg.push('<rect width=100% height=100% fill=url(#g', uid, ')/>');
     }
     defs.push('</defs>');
     svg.splice(1, 0, defs.join(''));

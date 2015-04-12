@@ -37,4 +37,5 @@ Apply the directive to the form element
 
 + Support all CSS3 color formats
 + Validation
++ Configurable output format
 + Configurable primary color chanel
