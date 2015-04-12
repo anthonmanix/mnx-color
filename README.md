@@ -7,6 +7,8 @@ AngularJS color picker directive
 Include required libraries
 
 ``` html
+<link rel="stylesheet" href="mnx-color.css">
+
 <script src="angular.js"></script>
 <script src="mnx-color.js"></script>
 ```

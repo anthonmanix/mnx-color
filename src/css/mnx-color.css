@@ -6,58 +6,61 @@
   user-select:none;
 }
 .mnx-color-container svg { display: block; }
-.mnx-color-col,
-.mnx-color-hue,
+.mnx-color-lch,
+.mnx-color-rch,
 .mnx-color-alpha { position: relative; }
-.mnx-color-alpha { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQYV2NkYGDwYcAEW9CFGIeIQix+wfQgyDODXSEAq2cGh0FBvIcAAAAASUVORK5CYII="); }
+.mnx-color-alpha { background-image: url("data:image/gif;base64,R0lGODdhCgAKAPAAALu7u////ywAAAAACgAKAAACEYQdmYcaDNxjEspKndVZbc8UADs="); }
 .mnx-color-container,
-.mnx-color-ccursor,
-.mnx-color-hcursor,
-.mnx-color-acursor { position: absolute; }
+.mnx-color-lcur,
+.mnx-color-rcur,
+.mnx-color-acur { position: absolute; }
 
 /* STYLEABLE */
 .mnx-color-container {
   padding: 5px;
-  border: 1px solid #000;
+  border: 1px solid #bbb;
+  background-color: #fff;
+  line-height: 0;
 }
-.mnx-color-col {
+.mnx-color-lch {
   display: inline-block;
   width: 127px; height: 127px;
-  border: 1px solid #000;
+  border: 1px solid #bbb;
 }
-.mnx-color-hue {
+.mnx-color-rch {
   display: inline-block;
   width: 15px; height: 127px;
   margin-left: 5px;
-  border: 1px solid #000;
+  border: 1px solid #bbb;
 }
 .mnx-color-alpha {
   width: 149px; height: 15px;
-  border: 1px solid #000;
+  margin-top: 5px;
+  border: 1px solid #bbb;
 }
-.mnx-color-ccursor:before,
-.mnx-color-ccursor:after,
-.mnx-color-hcursor:after,
-.mnx-color-acursor:after {
+.mnx-color-lcur:before,
+.mnx-color-lcur:after,
+.mnx-color-rcur:after,
+.mnx-color-acur:after {
   content: "";
   position: absolute;
   border: 1px solid #fff;
 }
-.mnx-color-ccursor:before,
-.mnx-color-ccursor:after {
+.mnx-color-lcur:before,
+.mnx-color-lcur:after {
   top: -2px; left: -2px;
   width: 3px; height: 3px;
   border-radius: 50%;
 }
-.mnx-color-ccursor:after {
+.mnx-color-lcur:after {
   top: -3px; left: -3px;
   width: 5px; height: 5px;
-  border-color: #000;
+  border-color: #444;
 }
-.mnx-color-hcursor:after,
-.mnx-color-acursor:after {
+.mnx-color-rcur:after,
+.mnx-color-acur:after {
   top: -1px; left: -1px;
-  outline: #000 solid 1px;
+  outline: #444 solid 1px;
 }
-.mnx-color-hcursor:after { width: 15px; height: 1px; }
-.mnx-color-acursor:after { width: 1px; height: 15px; }
+.mnx-color-rcur:after { width: 15px; height: 1px; }
+.mnx-color-acur:after { width: 1px; height: 15px; }
