@@ -2,6 +2,12 @@
 
 AngularJS color picker directive
 
+### Features
+
++ Supports CSS3 color formats (named, hex, rgb, rgba)
++ No dependencies other than AngularJS
++ Easy to style
+
 ### Setup
 
 Include required libraries
@@ -26,3 +32,9 @@ Apply the directive to the form element
 ``` html
 <input mnx-color ng-model="color">
 ```
+
+### Todo
+
++ Support all CSS3 color formats
++ Validation
++ Configurable primary color chanel
