@@ -187,7 +187,7 @@
               ('0' + rgb[2].toString(16)).substr(-2)
             ].join(''));
           }
-          ctrl.$render();
+          element.val(ctrl.$viewValue);
         }
 
         function inputUpdate() {
@@ -256,8 +256,8 @@
 
         function mousemove(event) {
           var
-            x = Math.min(current.width, Math.max(0, event.pageX - current.left)),
-            y = Math.min(current.height, Math.max(0, event.pageY - current.top));
+            x = clamp(event.pageX - current.left, current.width),
+            y = clamp(event.pageY - current.top, current.height);
           event.stopPropagation();
           event.preventDefault();
           pickerUpdate(x, y);
@@ -293,6 +293,7 @@
           lch.on('mousedown', mousedown);
           rch.on('mousedown', mousedown);
           alpha.on('mousedown', mousedown);
+          inputParse(ctrl.$viewValue);
           inputUpdate();
           watch();
           element.on('blur', function blur() {
