@@ -4,7 +4,7 @@ AngularJS color picker directive
 
 ### Features
 
-+ Supports CSS3 color formats (named, hex, rgb, rgba)
++ Supports all CSS3 color formats
 + No dependencies other than AngularJS
 + Easy to style
 
@@ -35,7 +35,6 @@ Apply the directive to the form element
 
 ### Todo
 
-+ Support all CSS3 color formats
 + Validation
 + Configurable output format
 + Configurable primary color chanel

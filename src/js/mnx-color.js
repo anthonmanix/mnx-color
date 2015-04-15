@@ -1,7 +1,7 @@
 (function (angular) {
   'use strict';
   var ns = 'mnx-color-', uid = 0;
-  
+
   /**
    * Creates a layered SVG gradient
    *
@@ -16,7 +16,7 @@
       defs = ['<defs>'],
       lidx, llen = layers.length,
       stops, sidx, slen;
-    
+
     for (lidx = 0; lidx < llen; lidx += 1) {
       uid += 1;
       defs.push('<linearGradient id=g', uid, layers[lidx].dir ? ' x2=0 y2=1' : '', '>');
@@ -31,10 +31,10 @@
     defs.push('</defs>');
     svg.splice(1, 0, defs.join(''));
     defs.push('</svg>');
-    
+
     return svg.join('');
   }
-  
+
   /**
    * Converts RGB to HSV
    *
@@ -46,18 +46,26 @@
       r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255,
       max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min,
       h = 0, s = 0;
+
     if (max !== min) {
       switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
       }
       h /= 6;
       s = d / max;
     }
+
     return [h, s, max];
   }
-  
+
   /**
    * Converts HSV to RGB
    *
@@ -76,7 +84,52 @@
       r = [v, q, p, p, t, v][mod],
       g = [t, v, v, q, p, p][mod],
       b = [p, p, t, v, v, q][mod];
+
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  /**
+   * Converts HSL to RGB
+   *
+   * @param {number[]} - integer values of HSL chanels
+   * @returns {number[]} - integer values of RGB chanels
+   */
+  function hslToRgb(hsl) {
+    var
+      h = hsl[0] / 360, s = hsl[1] / 100, l = hsl[2] / 100,
+      r, g, b, q, p;
+
+    function hue2rgb(p, q, t) {
+      if (t < 0) { t += 1; }
+      if (t > 1) { t -= 1; }
+      if (t < 1 / 6) { return p + (q - p) * 6 * t; }
+      if (t < 1 / 2) { return q; }
+      if (t < 2 / 3) { return p + (q - p) * (2 / 3 - t) * 6; }
+      return p;
+    }
+
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  /**
+   * Clamps the number between 0 and the max argument
+   *
+   * @param {number} - number to clamp
+   * @param {number} - maximum allowed number
+   * @returns {number} - clamped number
+   */
+  function clamp(n, max) {
+    return Math.min(max, Math.max(0, n));
   }
 
   function MnxColor($document) {
@@ -106,7 +159,7 @@
           rcur = angular.element('<div class="' + ns + 'rcur"></div>'),
           acur = angular.element('<div class="' + ns + 'acur"></div>'),
           rgb = [0, 0, 0], hsv = [0, 0, 0], a = 1, current, unwatch;
-        
+
         function pickerUpdate(x, y) {
           if (current.name === 'alpha') {
             a = x / current.width;
@@ -136,7 +189,7 @@
           }
           ctrl.$render();
         }
-        
+
         function inputUpdate() {
           hsv = rgbToHsv(rgb);
           lcur.css({
@@ -148,36 +201,59 @@
           lch.css({ 'background-color': 'rgb(' + hsvToRgb([hsv[0], 1, 1]) + ')' });
           stops.attr('stop-color', 'rgb(' + rgb + ')');
         }
-        
+
         function inputParse(value, old) {
-          if (value === old) { return; }
           var m = [];
-          if ((m = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(value))) {
-            rgb = [parseInt(m[1] + m[1], 16), parseInt(m[2] + m[2], 16), parseInt(m[3] + m[3], 16)];
-          } else if ((m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(value))) {
-            rgb = [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
-          } else if ((m = /^rgba?\((\d+),\s?(\d+),\s?(\d+),?\s?(\d*\.?\d+)?\)$/.exec(value))) {
-            rgb = [+m[1], +m[2], +m[3]];
-          } else if (value && (m = /^[a-z]{3,}$/i.exec(value))) {
-            alpha.css({ color: 'rgba(' + rgb + ',' + Math.round(a * 100) / 100 + ')' });
+          function parseHex(h) { return parseInt((h + h).substr(-2), 16); }
+
+          if (value === old) { return; }
+          if ((m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(value)) ||
+              (m = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(value))) {
+            // capture the hex color value
+            rgb = [parseHex(m[1]), parseHex(m[2]), parseHex(m[3])];
+            a = 1;
+          } else if ((m = /^rgb\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)$/.exec(value)) ||
+                     (m = /^rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d*\.?\d+)\)$/.exec(value))) {
+            // capture the rgb color value
+            rgb = [clamp(+m[1], 255), clamp(+m[2], 255), clamp(+m[3], 255)];
+            a = clamp(+(m[4] || 1), 1);
+          } else if ((m = /^rgb\((\d+)%\s*,\s*(\d+)%\s*,\s*(\d+)%\)$/.exec(value)) ||
+                     (m = /^rgba\((\d+)%\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,\s*(\d*\.?\d+)\)$/.exec(value))) {
+            // capture the rgb color value with %
+            rgb = [
+              Math.round(clamp(+m[1], 100) / 100 * 255),
+              Math.round(clamp(+m[2], 100) / 100 * 255),
+              Math.round(clamp(+m[3], 100) / 100 * 255)
+            ];
+            a = clamp(+(m[4] || 1), 1);
+          } else if ((m = /^hsl\((\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\)$/.exec(value)) ||
+                     (m = /^hsla\((\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*,\s*(\d*\.?\d+)\)$/.exec(value))) {
+            // capture the hsl and hsla color value
+            rgb = hslToRgb([clamp(+m[1], 360), clamp(+m[2], 100), clamp(+m[3], 100)]);
+            a = clamp(+(m[4] || 1), 1);
+          } else if (value === 'transparent') {
+            rgb = [0, 0, 0];
+            a = 0;
+          } else if (value && (m = /^[a-z]{3,}$/i.exec(value)) !== null) {
+            // capture the named color value
+            alpha.css({ color: 'rgba(0,0,0,0)' });
             alpha.css({ color: m[0] });
-            m = window.getComputedStyle(alpha[0]).color.match(/(\d?\.?\d+)+/g) || [0, 0, 0, '0'];
-            if (m.join() === rgb.join() + (a !== 1 ? ',' + a : '')) {
+            m = window.getComputedStyle(alpha[0]).color.match(/(\d)+/g);
+            if (m.join() === '0,0,0,0') {
               return;
             }
-            m.unshift(0);
-            rgb = [+m[1], +m[2], +m[3]];
+            rgb = [+m[0], +m[1], +m[2]];
+            a = 1;
           } else {
             return;
           }
-          a = +(m[4] || 1);
           inputUpdate();
         }
-        
+
         function watch() {
           unwatch = scope.$watch(attrs.ngModel, inputParse);
         }
-        
+
         function mousemove(event) {
           var
             x = Math.min(current.width, Math.max(0, event.pageX - current.left)),
@@ -203,7 +279,7 @@
             watch();
           });
         }
-        
+
         container
           .append(lch.append(lcur))
           .append(rch.append(rcur))
