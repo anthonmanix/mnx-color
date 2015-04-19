@@ -6,12 +6,11 @@
   </head>
   <body>
     <input mnx-color ng-model="color">
-    <input mnx-color ng-model="color2">
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
     <script src="../src/js/mnx-color.js"></script>
     <script>
-      angular.module('example', ['mnxColor']);
+      angular.module('example', ['mnxColor']).run(function ($rootScope) { $rootScope.color = 'green' });
     </script>
   </body>
 </html>
