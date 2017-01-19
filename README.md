@@ -32,14 +32,20 @@ Apply the directive to the form element
 ``` html
 <input
   ng-model="color"
-  mnx-color>
+  mnx-color
+  [mode=""]>
 ```
+
+#### `mode`
+*Optional*
+
+Sets the primary color chanel of the picker.
+Accepts: `h - hue, v - value`.
 
 ### Todo
 
 + Validation
 + Configurable output format
-+ Configurable primary color chanel
 
 ### License
 
